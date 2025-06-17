@@ -31,7 +31,8 @@
       width: 450px !important;
       height: 450px !important;
     }
-    #vmSizeChart {
+    #vmSizeChart,
+    #subscriptionChart {
       width: 100%;
       height: 400px;
     }
@@ -60,7 +61,7 @@
 
   <!-- Tab Contents -->
   <div class="tab-content" id="dashboardTabsContent">
-    
+
     <!-- Overview Tab -->
     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
       <div class="row justify-content-center text-center my-3">
@@ -79,6 +80,14 @@
         <div class="col-12">
           <h5 class="text-center">VM Size Distribution</h5>
           <canvas id="vmSizeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- VM Subscription Distribution Bar Chart -->
+      <div class="row mt-5">
+        <div class="col-12">
+          <h5 class="text-center">VM Count per Subscription</h5>
+          <canvas id="subscriptionChart"></canvas>
         </div>
       </div>
     </div>
