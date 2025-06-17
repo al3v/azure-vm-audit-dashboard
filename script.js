@@ -32,8 +32,9 @@ function renderPie(id, dataset) {
 }
 
 function renderVmSizeBarChart(sizeCounts) {
-  const labels = Object.keys(sizeCounts);
-  const values = Object.values(sizeCounts);
+  const sortedEntries = Object.entries(sizeCounts).sort((a, b) => b[1] - a[1]);
+  const labels = sortedEntries.map(([key]) => key);
+  const values = sortedEntries.map(([_, val]) => val);
 
   new Chart(document.getElementById("vmSizeChart"), {
     type: 'bar',
@@ -49,21 +50,30 @@ function renderVmSizeBarChart(sizeCounts) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { mode: 'index', intersect: false }
       },
       scales: {
+        x: {
+          ticks: {
+            maxRotation: 30,
+            minRotation: 30,
+            autoSkip: false
+          }
+        },
         y: {
           beginAtZero: true,
           ticks: {
-            precision: 0
+            stepSize: 1
           }
         }
       }
     }
   });
 }
+
 
 function renderTable(data) {
   const container = document.getElementById("table-container");
