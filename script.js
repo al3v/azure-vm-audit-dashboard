@@ -1,4 +1,3 @@
-
 const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
 
 const cpuPie = {
@@ -99,8 +98,33 @@ function renderTable(data) {
   table.innerHTML = thead + tbody;
   container.innerHTML = "";
   container.appendChild(table);
+
+  // Enable DataTables filtering
+  if (window.jQuery && $.fn.DataTable) {
+    $(table).DataTable({
+      pageLength: 10,
+      dom: 'ftip',
+      initComplete: function () {
+        this.api().columns().every(function () {
+          var column = this;
+          if (column.index() < 6) {
+            var select = $('<select><option value="">Filter</option></select>')
+              .appendTo($(column.header()))
+              .on('change', function () {
+                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                column.search(val ? '^' + val + '$' : '', true, false).draw();
+              });
+            column.data().unique().sort().each(function (d) {
+              select.append('<option value="' + d + '">' + d + '</option>');
+            });
+          }
+        });
+      }
+    });
+  }
 }
 
+// Fetch CSV and trigger everything
 fetch(csvUrl)
   .then(res => res.text())
   .then(text => {
@@ -122,34 +146,3 @@ fetch(csvUrl)
     document.getElementById("table-container").innerHTML = "<div class='text-danger'>Failed to load CSV data.</div>";
     console.error(err);
   });
-
-
-// Enhance the rendered table with DataTables.js
-window.addEventListener("DOMContentLoaded", () => {
-  const interval = setInterval(() => {
-    const table = document.querySelector("#table-container table");
-    if (table && window.jQuery && $.fn.DataTable) {
-      clearInterval(interval);
-      $(table).DataTable({
-        pageLength: 10,
-        dom: 'ftip',
-        initComplete: function () {
-          this.api().columns().every(function () {
-            var column = this;
-            if (column.index() < 6) { // Add filters only to first few columns
-              var select = $('<select><option value="">Filter</option></select>')
-                .appendTo($(column.header()))
-                .on('change', function () {
-                  var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                  column.search(val ? '^' + val + '$' : '', true, false).draw();
-                });
-              column.data().unique().sort().each(function (d, j) {
-                select.append('<option value="' + d + '">' + d + '</option>');
-              });
-            }
-          });
-        }
-      });
-    }
-  }, 500);
-});
