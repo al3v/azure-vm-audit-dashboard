@@ -122,3 +122,34 @@ fetch(csvUrl)
     document.getElementById("table-container").innerHTML = "<div class='text-danger'>Failed to load CSV data.</div>";
     console.error(err);
   });
+
+
+// Enhance the rendered table with DataTables.js
+window.addEventListener("DOMContentLoaded", () => {
+  const interval = setInterval(() => {
+    const table = document.querySelector("#table-container table");
+    if (table && window.jQuery && $.fn.DataTable) {
+      clearInterval(interval);
+      $(table).DataTable({
+        pageLength: 10,
+        dom: 'ftip',
+        initComplete: function () {
+          this.api().columns().every(function () {
+            var column = this;
+            if (column.index() < 6) { // Add filters only to first few columns
+              var select = $('<select><option value="">Filter</option></select>')
+                .appendTo($(column.header()))
+                .on('change', function () {
+                  var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                  column.search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+              column.data().unique().sort().each(function (d, j) {
+                select.append('<option value="' + d + '">' + d + '</option>');
+              });
+            }
+          });
+        }
+      });
+    }
+  }, 500);
+});
