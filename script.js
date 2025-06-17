@@ -1,18 +1,45 @@
 
+const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
 
-const cpuVMs = {
-  "Ghost (<2%)": ["eSUBmgr3-Trial-eSUB-Production-Linux-VM", "Presales-Multi-Linux-VM"],
-  "Underutilized (<5%)": ["PreGeneris-eCTD-DC-VM", "PreGeneris-eSUB-Production-Linux-VM"],
-  "Healthy (≥5%)": ["eSUBmgr3-Trial-eSUB-Production-VM", "PreGeneris-eCTD-SH-VM", "PreGeneris-eSUB-Production-VM", "Presales-Multi-01-SH-VM", "Presales-Multi-02-SH-VM", "Presales-Multi-03-SH-VM", "Presales-Multi-DC-VM", "BasicSKU-Levy", "CMK-Temp-VM", "RClone-VMLevy"]
+const cpuPie = {
+  labels: ['Ghost (<2%)', 'Underutilized (<5%)', 'Healthy (≥5%)'],
+  colors: ['#e74c3c', '#f1c40f', '#2ecc71']
 };
 
-
-const ramVMs = {
-  "Ghost (<2%)": [],
-  "Underutilized (<5%)": [],
-  "Healthy (≥5%)": ["eSUBmgr3-Trial-eSUB-Production-Linux-VM", "eSUBmgr3-Trial-eSUB-Production-VM", "PreGeneris-eCTD-DC-VM", "PreGeneris-eCTD-SH-VM", "PreGeneris-eSUB-Production-Linux-VM", "PreGeneris-eSUB-Production-VM", "Presales-Multi-01-SH-VM", "Presales-Multi-02-SH-VM", "Presales-Multi-03-SH-VM", "Presales-Multi-DC-VM", "Presales-Multi-Linux-VM", "BasicSKU-Levy", "CMK-Temp-VM", "RClone-VMLevy"]
+const ramPie = {
+  labels: ['Ghost (<2%)', 'Underutilized (<5%)', 'Healthy (≥5%)'],
+  colors: ['#e74c3c', '#f1c40f', '#2ecc71']
 };
 
+function categorizeVMs(data) {
+  const cpu = {
+    "Ghost (<2%)": [],
+    "Underutilized (<5%)": [],
+    "Healthy (≥5%)": []
+  };
+  const ram = JSON.parse(JSON.stringify(cpu));
+
+  data.forEach(row => {
+    const vm = row["VM_Name"];
+    if (row["Ghost_VM (CPU < 2%)"] === "Yes") {
+      cpu["Ghost (<2%)"].push(vm);
+    } else if (row["Underutilized_VM (CPU < 5%)"] === "Yes") {
+      cpu["Underutilized (<5%)"].push(vm);
+    } else {
+      cpu["Healthy (≥5%)"].push(vm);
+    }
+
+    if (row["Ghost_VM (RAM < 2%)"] === "Yes") {
+      ram["Ghost (<2%)"].push(vm);
+    } else if (row["Underutilized_VM (RAM < 5%)"] === "Yes") {
+      ram["Underutilized (<5%)"].push(vm);
+    } else {
+      ram["Healthy (≥5%)"].push(vm);
+    }
+  });
+
+  return { cpu, ram };
+}
 
 function renderLegend(containerId, vmMap) {
   const container = document.getElementById(containerId);
@@ -25,12 +52,13 @@ function renderLegend(containerId, vmMap) {
 }
 
 function renderPie(id, dataset, vmMap) {
+  const data = dataset.labels.map(label => vmMap[label].length);
   new Chart(document.getElementById(id), {
     type: 'pie',
     data: {
       labels: dataset.labels,
       datasets: [{
-        data: dataset.data,
+        data: data,
         backgroundColor: dataset.colors
       }]
     },
@@ -44,8 +72,8 @@ function renderPie(id, dataset, vmMap) {
           callbacks: {
             label: function(context) {
               const label = context.label || '';
-              const vms = vmMap[label];
-              return `${label}: ${vms.length} VM(s)\n` + vms.join(", ");
+              const vms = vmMap[label] || [];
+              return `${label}: ${vms.length} VM(s)\n` + vms.map(vm => `• ${vm}`).join("\n");
             }
           }
         }
@@ -54,23 +82,24 @@ function renderPie(id, dataset, vmMap) {
   });
 }
 
+function renderTable(data) {
+  const container = document.getElementById("table-container");
+  const headers = Object.keys(data[0]);
+  const table = document.createElement("table");
+  table.className = "table table-bordered table-hover table-sm";
 
-const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
+  const thead = "<thead class='table-light'><tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr></thead>";
+  const tbody = "<tbody>" + data.map(row => {
+    const rowStyle = row["Ghost_VM (CPU < 2%)"] === "Yes" || row["Ghost_VM (RAM < 2%)"] === "Yes"
+      ? "table-danger" : row["Underutilized_VM (CPU < 5%)"] === "Yes" || row["Underutilized_VM (RAM < 5%)"] === "Yes"
+      ? "table-warning" : "";
+    return `<tr class="${rowStyle}">` + headers.map(h => `<td>${row[h] || ""}</td>`).join("") + "</tr>";
+  }).join("") + "</tbody>";
 
-
-const cpuPie = {
-  labels: ['Ghost (<2%)', 'Underutilized (<5%)', 'Healthy (≥5%)'],
-  data: [2, 2, 10],
-  colors: ['#e74c3c', '#f1c40f', '#2ecc71']
-};
-
-const ramPie = {
-  labels: ['Ghost (<2%)', 'Underutilized (<5%)', 'Healthy (≥5%)'],
-  data: [0, 0, 14],
-  colors: ['#e74c3c', '#f1c40f', '#2ecc71']
-};
-
-
+  table.innerHTML = thead + tbody;
+  container.innerHTML = "";
+  container.appendChild(table);
+}
 
 fetch(csvUrl)
   .then(res => res.text())
@@ -78,7 +107,15 @@ fetch(csvUrl)
     Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
-      complete: results => renderTable(results.data)
+      complete: results => {
+        const data = results.data;
+        renderTable(data);
+        const { cpu, ram } = categorizeVMs(data);
+        renderPie("cpuChart", cpuPie, cpu);
+        renderPie("ramChart", ramPie, ram);
+        renderLegend("cpu-legend", cpu);
+        renderLegend("ram-legend", ram);
+      }
     });
   })
   .catch(err => {
@@ -86,9 +123,33 @@ fetch(csvUrl)
     console.error(err);
   });
 
+
+// Enhance the rendered table with DataTables.js
 window.addEventListener("DOMContentLoaded", () => {
-  renderPie("cpuChart", cpuPie, cpuVMs);
-  renderPie("ramChart", ramPie, ramVMs);
-  renderLegend("cpu-legend", cpuVMs);
-  renderLegend("ram-legend", ramVMs);
+  const interval = setInterval(() => {
+    const table = document.querySelector("#table-container table");
+    if (table && window.jQuery && $.fn.DataTable) {
+      clearInterval(interval);
+      $(table).DataTable({
+        pageLength: 10,
+        dom: 'ftip',
+        initComplete: function () {
+          this.api().columns().every(function () {
+            var column = this;
+            if (column.index() < 6) { // Add filters only to first few columns
+              var select = $('<select><option value="">Filter</option></select>')
+                .appendTo($(column.header()))
+                .on('change', function () {
+                  var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                  column.search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+              column.data().unique().sort().each(function (d, j) {
+                select.append('<option value="' + d + '">' + d + '</option>');
+              });
+            }
+          });
+        }
+      });
+    }
+  }, 500);
 });
