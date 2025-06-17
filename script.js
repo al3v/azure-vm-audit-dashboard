@@ -1,5 +1,9 @@
 const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
 
+function shortenLabel(str) {
+  return str.length > 16 ? str.slice(0, 6) + "..." + str.slice(-6) : str;
+}
+
 function renderPieChart(id, dataset, title) {
   new Chart(document.getElementById(id), {
     type: 'pie',
@@ -66,7 +70,8 @@ function renderVmSizeBarChart(sizeCounts) {
 
 function renderSubscriptionBarChart(subscriptionCounts) {
   const sorted = Object.entries(subscriptionCounts).sort((a, b) => b[1] - a[1]);
-  const labels = sorted.map(([k]) => k);
+  const labels = sorted.map(([k]) => shortenLabel(k));
+  const fullLabels = sorted.map(([k]) => k);
   const values = sorted.map(([_, v]) => v);
 
   new Chart(document.getElementById("subscriptionChart"), {
@@ -86,7 +91,14 @@ function renderSubscriptionBarChart(subscriptionCounts) {
       responsive: true,
       plugins: {
         legend: { display: false },
-        tooltip: { mode: 'index', intersect: false }
+        tooltip: {
+          callbacks: {
+            title: context => {
+              const index = context[0].dataIndex;
+              return fullLabels[index];
+            }
+          }
+        }
       },
       scales: {
         x: {

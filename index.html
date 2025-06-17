@@ -28,13 +28,11 @@
     canvas {
       display: block;
       margin: auto;
-      width: 450px !important;
-      height: 450px !important;
     }
     #vmSizeChart,
     #subscriptionChart {
       width: 100%;
-      height: 400px;
+      height: 350px !important;
     }
     .tab-pane {
       padding-top: 20px;
@@ -67,25 +65,21 @@
       <div class="row justify-content-center text-center my-3">
         <div class="col-md-6 mb-4">
           <h5 class="text-center">CPU Usage</h5>
-          <canvas id="cpuChart"></canvas>
+          <canvas id="cpuChart" width="450" height="450"></canvas>
         </div>
         <div class="col-md-6 mb-4">
           <h5 class="text-center">RAM Usage</h5>
-          <canvas id="ramChart"></canvas>
+          <canvas id="ramChart" width="450" height="450"></canvas>
         </div>
       </div>
 
-      <!-- VM Size Distribution -->
+      <!-- VM Size + Subscription Distribution (side-by-side) -->
       <div class="row mt-5">
-        <div class="col-12">
+        <div class="col-md-6">
           <h5 class="text-center">VM Size Distribution</h5>
           <canvas id="vmSizeChart"></canvas>
         </div>
-      </div>
-
-      <!-- VM Count per Subscription -->
-      <div class="row mt-5">
-        <div class="col-12">
+        <div class="col-md-6">
           <h5 class="text-center">VM Count per Subscription</h5>
           <canvas id="subscriptionChart"></canvas>
         </div>
