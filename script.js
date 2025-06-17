@@ -1,15 +1,18 @@
 
+
 const cpuVMs = {
   "Ghost (<2%)": ["eSUBmgr3-Trial-eSUB-Production-Linux-VM", "Presales-Multi-Linux-VM"],
   "Underutilized (<5%)": ["PreGeneris-eCTD-DC-VM", "PreGeneris-eSUB-Production-Linux-VM"],
   "Healthy (≥5%)": ["eSUBmgr3-Trial-eSUB-Production-VM", "PreGeneris-eCTD-SH-VM", "PreGeneris-eSUB-Production-VM", "Presales-Multi-01-SH-VM", "Presales-Multi-02-SH-VM", "Presales-Multi-03-SH-VM", "Presales-Multi-DC-VM", "BasicSKU-Levy", "CMK-Temp-VM", "RClone-VMLevy"]
 };
 
+
 const ramVMs = {
   "Ghost (<2%)": [],
   "Underutilized (<5%)": [],
   "Healthy (≥5%)": ["eSUBmgr3-Trial-eSUB-Production-Linux-VM", "eSUBmgr3-Trial-eSUB-Production-VM", "PreGeneris-eCTD-DC-VM", "PreGeneris-eCTD-SH-VM", "PreGeneris-eSUB-Production-Linux-VM", "PreGeneris-eSUB-Production-VM", "Presales-Multi-01-SH-VM", "Presales-Multi-02-SH-VM", "Presales-Multi-03-SH-VM", "Presales-Multi-DC-VM", "Presales-Multi-Linux-VM", "BasicSKU-Levy", "CMK-Temp-VM", "RClone-VMLevy"]
 };
+
 
 function renderLegend(containerId, vmMap) {
   const container = document.getElementById(containerId);
@@ -51,6 +54,12 @@ function renderPie(id, dataset, vmMap) {
   });
 }
 
+
+const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
+
+
+
+
 const csvUrl = "https://malwarestorage123levy.blob.core.windows.net/vmaudit-reports/latest.csv?sp=r&st=2025-06-17T10:10:35Z&se=2027-06-01T18:13:35Z&spr=https&sv=2024-11-04&sr=b&sig=v6qehSQY%2B9wS9vZipmhTCVDnnVvWBdKz9le%2BnszLXc0%3D";
 
 const cpuPie = {
@@ -65,24 +74,7 @@ const ramPie = {
   colors: ['#e74c3c', '#f1c40f', '#2ecc71']
 };
 
-function renderTable(data) {
-  const container = document.getElementById("table-container");
-  const headers = Object.keys(data[0]);
-  const table = document.createElement("table");
-  table.className = "table table-bordered table-hover table-sm";
 
-  const thead = "<thead class='table-light'><tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr></thead>";
-  const tbody = "<tbody>" + data.map(row => {
-    const rowStyle = row["Ghost_VM (CPU < 2%)"] === "Yes" || row["Ghost_VM (RAM < 2%)"] === "Yes"
-      ? "table-danger" : row["Underutilized_VM (CPU < 5%)"] === "Yes" || row["Underutilized_VM (RAM < 5%)"] === "Yes"
-      ? "table-warning" : "";
-    return `<tr class="${rowStyle}">` + headers.map(h => `<td>${row[h] || ""}</td>`).join("") + "</tr>";
-  }).join("") + "</tbody>";
-
-  table.innerHTML = thead + tbody;
-  container.innerHTML = "";
-  container.appendChild(table);
-}
 
 fetch(csvUrl)
   .then(res => res.text())
