@@ -70,4 +70,5 @@ fetch(csvUrl)
 window.addEventListener("DOMContentLoaded", () => {
   renderPie("cpuChart", cpuPie);
   renderPie("ramChart", ramPie);
-};
+});
+
