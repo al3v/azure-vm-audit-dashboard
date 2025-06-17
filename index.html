@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Azure VM Audit Dashboard</title>
-  
+
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
+
   <!-- Chart.js + PapaParse + jQuery + DataTables -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -30,6 +30,10 @@
       margin: auto;
       width: 450px !important;
       height: 450px !important;
+    }
+    #vmSizeChart {
+      max-width: 100%;
+      height: auto;
     }
     .tab-pane {
       padding-top: 20px;
@@ -67,6 +71,14 @@
         <div class="col-md-6 mb-4">
           <h5 class="text-center">RAM Usage</h5>
           <canvas id="ramChart"></canvas>
+        </div>
+      </div>
+
+      <!-- VM Size Distribution Bar Chart -->
+      <div class="row mt-5">
+        <div class="col-12">
+          <h5 class="text-center">VM Size Distribution</h5>
+          <canvas id="vmSizeChart"></canvas>
         </div>
       </div>
     </div>
