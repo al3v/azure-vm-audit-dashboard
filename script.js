@@ -67,7 +67,7 @@ fetch(csvUrl)
     console.error(err);
   });
 
-window.onload = () => {
+window.addEventListener("DOMContentLoaded", () => {
   renderPie("cpuChart", cpuPie);
   renderPie("ramChart", ramPie);
 };
