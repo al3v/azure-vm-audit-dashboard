@@ -1,23 +1,50 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Azure VM Audit Dashboard</title>
+  
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Chart.js + PapaParse + jQuery + DataTables -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="script.js" defer></script>
-
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+  <!-- Your JS -->
+  <script src="script.js" defer></script>
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    h1 {
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+      width: 250px !important;
+      height: 250px !important;
+    }
+    .tab-pane {
+      padding-top: 20px;
+    }
+    .nav-tabs .nav-link {
+      font-weight: bold;
+    }
+  </style>
 </head>
+
 <body>
 <div class="container py-4">
   <h1 class="mb-4">Azure VM Audit Dashboard</h1>
 
+  <!-- Tab Navigation -->
   <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">🔘 Overview</button>
@@ -27,26 +54,32 @@
     </li>
   </ul>
 
-  <div class="tab-content mt-3" id="dashboardTabsContent">
-    <div class="tab-pane fade show active" id="overview" role="tabpanel">
-      <div class="row">
-        <div class="col-md-6">
+  <!-- Tab Contents -->
+  <div class="tab-content" id="dashboardTabsContent">
+    
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+      <div class="row justify-content-center text-center my-3">
+        <div class="col-md-6 mb-4">
           <h5 class="text-center">CPU Usage</h5>
           <canvas id="cpuChart"></canvas>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 mb-4">
           <h5 class="text-center">RAM Usage</h5>
           <canvas id="ramChart"></canvas>
         </div>
       </div>
     </div>
 
-    <div class="tab-pane fade" id="table" role="tabpanel">
+    <!-- Table Tab -->
+    <div class="tab-pane fade" id="table" role="tabpanel" aria-labelledby="table-tab">
       <div id="table-container" class="table-responsive">Loading table...</div>
     </div>
+
   </div>
 </div>
 
+<!-- Bootstrap Bundle (with Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
